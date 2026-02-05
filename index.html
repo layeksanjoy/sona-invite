@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For Sona</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --card-color: #ffffff;
+            --text-color: #000000;
+            --accent-color: #eb0029;
+        }
+
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Pixelify Sans', sans-serif;
+            overflow: hidden;
+            
+            /* BACKGROUND IMAGE LOGIC */
+            background-image: url('heart-bg.jpg');
+            background-size: 500px;
+            background-repeat: repeat;
+            background-position: center;
+            background-color: #fcf3f2; /* Fallback color */
+        }
+
+        /* --- ENVELOPE STYLES --- */
+        #envelope-screen {
+            position: absolute;
+            z-index: 100; /* sits on top of everything */
+            text-align: center;
+            cursor: pointer;
+            transition: opacity 0.8s ease-out; /* Smooth fade out */
+        }
+
+        #envelope-screen img {
+            width: 300px; /* Adjust size of envelope */
+            max-width: 80vw;
+            display: block;
+            margin: 0 auto;
+            /* Pixel art crisp rendering */
+            image-rendering: pixelated; 
+            drop-shadow: 10px 10px 0px rgba(0,0,0,0.2);
+            transition: transform 0.2s;
+        }
+
+        #envelope-screen:hover img {
+            transform: scale(1.05); /* Slight zoom on hover */
+        }
+
+        .click-text {
+            margin-top: 20px;
+            font-size: 1.5rem;
+            color: var(--text-color);
+            font-weight: 700;
+            background: white;
+            padding: 5px 15px;
+            border: 2px solid black;
+            display: inline-block;
+        }
+
+        /* --- MAIN CARD STYLES --- */
+        .card {
+            background: var(--card-color);
+            border: 3px solid var(--text-color);
+            padding: 40px 40px;
+            text-align: center;
+            border-radius: 32px; 
+            box-shadow: 10px 10px 0px var(--text-color);
+            max-width: 400px;
+            width: 85%;
+            position: relative;
+            z-index: 10;
+            
+            /* Hidden initially */
+            display: none; 
+            opacity: 0;
+            transition: opacity 1s ease-in;
+        }
+
+        h1 {
+            font-weight: 700;
+            font-size: 2rem;
+            margin-bottom: 40px;
+            text-transform: uppercase;
+            line-height: 1.2;
+            color: var(--text-color);
+        }
+
+        .highlight {
+            color: var(--accent-color);
+        }
+
+        .btn-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            width: 100%;
+            justify-items: center;
+            min-height: 60px;
+        }
+
+        button {
+            font-family: 'Pixelify Sans', sans-serif;
+            font-weight: 700;
+            font-size: 1.2rem;
+            width: 110px; 
+            height: 50px; 
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: 3px solid var(--text-color);
+            background: transparent;
+            text-transform: uppercase;
+            transition: transform 0.1s;
+            border-radius: 50px; 
+        }
+
+        #yesBtn {
+            background-color: var(--text-color);
+            color: var(--card-color);
+            justify-self: end; 
+        }
+
+        #yesBtn:hover {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+
+        #noBtn {
+            background-color: var(--card-color);
+            color: var(--text-color);
+            justify-self: start; 
+            position: relative; 
+            box-sizing: border-box;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .gif-container {
+            width: 100%;
+            border: 3px solid var(--text-color);
+            margin-bottom: 20px;
+            box-shadow: 6px 6px 0px var(--text-color);
+            overflow: hidden; 
+            border-radius: 20px;
+        }
+
+        .subline {
+            margin-top: -20px;
+            font-size: 1.5rem;
+            color: var(--accent-color);
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        
+    </style>
+</head>
+<body>
+
+    <div id="envelope-screen" onclick="openEnvelope()">
+        <img src="envelope.png" alt="Love Letter">
+        <div class="click-text">CLICK TO OPEN</div>
+    </div>
+
+    <div class="card" id="mainCard">
+        <div id="questionSection">
+            <h1>Will you be my Valentine<span class="highlight">?</span></h1>
+            <div class="btn-container">
+                <button id="yesBtn" onclick="acceptProposal()">Yes</button>
+                <button id="noBtn">No</button>
+            </div>
+        </div>
+
+        <div id="successSection" class="hidden">
+            <div class="gif-container">
+                <div class="tenor-gif-embed" data-postid="11951420229067864601" data-share-method="host" data-aspect-ratio="0.911647" data-width="100%"><a href="https://tenor.com/view/cute-gif-11951420229067864601">Cute Sticker</a>from <a href="https://tenor.com/search/cute-stickers">Cute Stickers</a></div> <script type="text/javascript" async src="https://tenor.com/embed.js"></script>
+            </div>
+            <h1>You are invited to the best worst date ever<span class="highlight">!</span></h1>
+            <div class="subline">Love you Sona</div>
+        </div>
+    </div>
+
+    <script>
+        const envelopeScreen = document.getElementById('envelope-screen');
+        const mainCard = document.getElementById('mainCard');
+        const noBtn = document.getElementById('noBtn');
+        const questionSection = document.getElementById('questionSection');
+        const successSection = document.getElementById('successSection');
+
+        /* 1. Logic to Open Envelope */
+        function openEnvelope() {
+            // Fade out envelope
+            envelopeScreen.style.opacity = '0';
+            
+            // Wait for fade out, then remove envelope and show card
+            setTimeout(() => {
+                envelopeScreen.style.display = 'none';
+                
+                mainCard.style.display = 'block';
+                // Small delay to allow display:block to apply before changing opacity
+                setTimeout(() => {
+                    mainCard.style.opacity = '1';
+                }, 50);
+                
+            }, 800); // 800ms matches the CSS transition time
+        }
+
+        /* 2. Logic to make No button run */
+        function moveNoButton() {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            const newX = Math.random() * (width - 150) + 20; 
+            const newY = Math.random() * (height - 100) + 20;
+
+            noBtn.style.position = "fixed"; 
+            noBtn.style.left = newX + "px";
+            noBtn.style.top = newY + "px";
+        }
+
+        noBtn.addEventListener('mouseenter', moveNoButton);
+        noBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            moveNoButton();
+        });
+
+        /* 3. Logic for Yes Button */
+        function acceptProposal() {
+            questionSection.style.display = 'none';
+            successSection.style.display = 'block';
+            
+            // Confetti
+            var end = Date.now() + (3 * 1000);
+            var colors = ['#eb0029', '#ffffff', '#000000'];
+
+            (function frame() {
+                confetti({
+                    particleCount: 5,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0 },
+                    colors: colors
+                });
+                confetti({
+                    particleCount: 5,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1 },
+                    colors: colors
+                });
+
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            }());
+        }
+    </script>
+
+</body>
+</html>
