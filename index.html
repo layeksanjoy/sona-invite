@@ -1,1 +1,1158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Daily Study Accountability Journal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            --bg: #f6f4ff;
+            --card: #ffffff;
+            --card-2: #f1f4ff;
+            --text: #1b1b2a;
+            --muted: #5b617a;
+            --accent: #6ee7b7;
+            --warning: #f59e0b;
+            --danger: #fda4af;
+            --border: #d7dbea;
+            --focus: #2563eb;
+        }
 
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Pixelify Sans", system-ui, -apple-system, Arial, sans-serif;
+            background: radial-gradient(circle at top, #ffffff, var(--bg));
+            color: var(--text);
+            line-height: 1.5;
+        }
+
+        .skip-link {
+            position: absolute;
+            top: -100%;
+            left: 0;
+            background: var(--accent);
+            color: #04110d;
+            padding: 12px 18px;
+            text-decoration: none;
+            font-weight: 700;
+            border-radius: 6px;
+            z-index: 10;
+        }
+
+        .skip-link:focus {
+            top: 12px;
+            left: 12px;
+        }
+
+        header {
+            padding: 36px 24px 0;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header h1 {
+            font-size: clamp(2rem, 4vw, 3rem);
+            margin: 0 0 10px;
+        }
+
+        header p {
+            margin: 0 0 24px;
+            color: var(--muted);
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px 56px;
+            display: grid;
+            gap: 22px;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 22px;
+            box-shadow: 0 8px 22px rgba(30, 50, 90, 0.12);
+        }
+
+        .card h2 {
+            margin: 0 0 12px;
+            font-size: 1.3rem;
+        }
+
+        .grid {
+            display: grid;
+            gap: 16px;
+        }
+
+        .grid.two {
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: var(--card-2);
+            color: var(--text);
+            font-size: 1rem;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .helper {
+            color: var(--muted);
+            font-size: 0.9rem;
+            margin-top: 4px;
+        }
+
+        .hero {
+            display: grid;
+            gap: 18px;
+            align-items: center;
+        }
+
+        .hero .intro {
+            max-width: 680px;
+            font-size: 1.05rem;
+        }
+
+        .hero-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .soft-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(110, 231, 183, 0.18);
+            color: #0f5132;
+            border-radius: 999px;
+            padding: 6px 12px;
+            font-size: 0.85rem;
+            width: fit-content;
+        }
+
+        .buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        button {
+            min-width: 44px;
+            min-height: 44px;
+            padding: 10px 18px;
+            border-radius: 10px;
+            border: 1px solid transparent;
+            background: var(--accent);
+            color: #04110d;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.12s ease, box-shadow 0.12s ease;
+        }
+
+        button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 14px rgba(30, 50, 90, 0.14);
+        }
+
+        button.secondary {
+            background: transparent;
+            color: var(--text);
+            border-color: var(--border);
+        }
+
+        button.danger {
+            background: var(--danger);
+            color: #2b080f;
+        }
+
+        button:focus-visible,
+        input:focus-visible,
+        select:focus-visible,
+        textarea:focus-visible {
+            outline: 3px solid var(--focus);
+            outline-offset: 2px;
+        }
+
+        .stats {
+            display: grid;
+            gap: 12px;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        }
+
+        .stat {
+            background: var(--card-2);
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .stat .value {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin: 6px 0;
+        }
+
+        .status {
+            padding: 10px 12px;
+            border-radius: 10px;
+            background: rgba(110, 231, 183, 0.18);
+            color: #0f5132;
+            border: 1px solid rgba(110, 231, 183, 0.4);
+        }
+
+        .warning {
+            color: var(--warning);
+        }
+
+        .history {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: grid;
+            gap: 10px;
+        }
+
+        .history li {
+            background: var(--card-2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px 14px;
+        }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(37, 99, 235, 0.12);
+            color: #1d3e9b;
+            border-radius: 999px;
+            padding: 4px 10px;
+            font-size: 0.85rem;
+        }
+
+        .toggle {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            border-radius: 14px;
+            background: #edf2ff;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .toggle input {
+            appearance: none;
+            width: 46px;
+            height: 26px;
+            border-radius: 999px;
+            background: #cbd5f5;
+            position: relative;
+            border: 2px solid transparent;
+            transition: background 0.2s ease;
+        }
+
+        .toggle input::after {
+            content: "";
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 18px;
+            height: 18px;
+            border-radius: 999px;
+            background: #ffffff;
+            transition: transform 0.2s ease;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+        }
+
+        .toggle input:checked {
+            background: #7ee7c5;
+        }
+
+        .toggle input:checked::after {
+            transform: translateX(20px);
+        }
+
+        .toggle-text {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .toggle-text span {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--muted);
+        }
+
+        .habit-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .habit-item {
+            display: grid;
+            grid-template-columns: 24px 1fr auto;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: var(--card-2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+        }
+
+        .habit-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+        }
+
+        .habit-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .habit-input-row {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .habit-pill {
+            background: rgba(110, 231, 183, 0.2);
+            color: #0f5132;
+            border-radius: 999px;
+            padding: 4px 10px;
+            font-size: 0.8rem;
+        }
+
+        footer {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px 40px;
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        .section-title {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .section-title p {
+            margin: 0;
+            color: var(--muted);
+        }
+
+        .shared-grid {
+            display: grid;
+            gap: 14px;
+        }
+
+        .shared-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: grid;
+            gap: 10px;
+        }
+
+        .shared-list li {
+            background: var(--card-2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px 14px;
+        }
+    </style>
+</head>
+<body>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+    <header class="hero">
+        <div class="soft-badge">Daily check in • Shared with your partner</div>
+        <h1>Daily Study Accountability Journal</h1>
+        <div class="grid two" style="max-width: 600px; margin-bottom: 20px;">
+            <div>
+                <label for="header-user">Current User</label>
+                <select id="header-user" style="font-size: 1.1rem; padding: 12px;">
+                    <option value="Sanjoy">Sanjoy</option>
+                    <option value="Diya">Diya</option>
+                </select>
+            </div>
+            <div>
+                <label for="sheet-url">Shared Google Sheets URL</label>
+                <input id="sheet-url" type="url" placeholder="Paste your Apps Script web app URL" style="padding: 12px;" />
+            </div>
+        </div>
+        <p class="intro">
+            A calm, friendly space to track study, habits, and phone use. All data is shared between Sanjoy and Diya.
+        </p>
+        <div class="hero-actions">
+            <button id="jump-today" type="button">Start today</button>
+            <button id="sync-now" type="button" class="secondary">Sync with partner</button>
+        </div>
+    </header>
+
+    <main id="main-content" tabindex="-1">
+        <section class="card" aria-labelledby="today-title">
+            <div class="section-title">
+                <h2 id="today-title">Today check in</h2>
+                <p>Just fill what matters today. Short is fine.</p>
+            </div>
+            <div class="grid two">
+                <div>
+                    <label for="entry-date">Date</label>
+                    <input id="entry-date" type="date" />
+                </div>
+                <div>
+                    <label for="mood">Mood</label>
+                    <select id="mood">
+                        <option value="">Select mood</option>
+                        <option value="energized">Energized</option>
+                        <option value="steady">Steady</option>
+                        <option value="tired">Tired</option>
+                        <option value="anxious">Anxious</option>
+                        <option value="low">Low</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="sleep-hours">Sleep hours</label>
+                    <input id="sleep-hours" type="number" min="0" step="0.5" />
+                </div>
+                <div>
+                    <label for="study-goal-hours">Study goal (hours)</label>
+                    <input id="study-goal-hours" type="number" min="0" step="0.5" />
+                </div>
+                <div>
+                    <label for="study-hours">Actual study (hours)</label>
+                    <input id="study-hours" type="number" min="0" step="0.5" />
+                </div>
+                <div>
+                    <label for="phone-minutes">Phone use (minutes)</label>
+                    <input id="phone-minutes" type="number" min="0" step="5" />
+                </div>
+            </div>
+            <p class="helper">Gentle reminder: real numbers help you grow, not judge.</p>
+        </section>
+
+        <section class="card" aria-labelledby="plan-title">
+            <div class="section-title">
+                <h2 id="plan-title">Accountability plan</h2>
+                <p>Keep it simple. Pick a few focus items.</p>
+            </div>
+            <div class="grid two">
+                <div>
+                    <label for="task-1">Top task 1</label>
+                    <input id="task-1" type="text" />
+                </div>
+                <div>
+                    <label for="task-2">Top task 2</label>
+                    <input id="task-2" type="text" />
+                </div>
+                <div>
+                    <label for="task-3">Top task 3</label>
+                    <input id="task-3" type="text" />
+                </div>
+                <div>
+                    <label for="reward">Reward for completion</label>
+                    <input id="reward" type="text" />
+                </div>
+            </div>
+            <div class="grid">
+                <div>
+                    <label for="if-then">If I feel distracted, then I will</label>
+                    <textarea id="if-then" placeholder="Example: Put phone in another room and do 5 minutes of deep work."></textarea>
+                </div>
+                <div>
+                    <label for="obstacles">Likely obstacles</label>
+                    <textarea id="obstacles" placeholder="Example: urge to scroll after lunch."></textarea>
+                </div>
+            </div>
+            <label class="toggle">
+                <input id="phone-pledge" type="checkbox" />
+                <span class="toggle-text">
+                    Phone away during study blocks
+                    <span>Soft commitment for today</span>
+                </span>
+            </label>
+        </section>
+
+        <section class="card" aria-labelledby="habits-title">
+            <div class="section-title">
+                <h2 id="habits-title">Habit tracker</h2>
+                <p>Create habits and check them daily.</p>
+            </div>
+            <div class="habit-input-row">
+                <input id="habit-name" type="text" placeholder="Add a new habit (e.g., 30 min reading)" />
+                <button id="add-habit" type="button">Add habit</button>
+            </div>
+            <div class="habit-list" id="habit-list"></div>
+            <p class="helper">Small habits build momentum.</p>
+        </section>
+
+        <section class="card" aria-labelledby="journal-title">
+            <div class="section-title">
+                <h2 id="journal-title">Daily journal</h2>
+                <p>Quick notes are enough. You can always add more later.</p>
+            </div>
+            <div class="grid">
+                <div>
+                    <label for="journal-entry">Journal entry</label>
+                    <textarea id="journal-entry" placeholder="How did the day go? What did you learn?"></textarea>
+                </div>
+                <div>
+                    <label for="wins">Wins today</label>
+                    <textarea id="wins" placeholder="Small wins count."></textarea>
+                </div>
+                <div>
+                    <label for="gratitude">Gratitude</label>
+                    <textarea id="gratitude" placeholder="What are you grateful for?"></textarea>
+                </div>
+                <div>
+                    <label for="tomorrow-focus">Tomorrow focus</label>
+                    <textarea id="tomorrow-focus" placeholder="Set a clear target for tomorrow."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="card" aria-labelledby="shared-title">
+            <div class="section-title">
+                <h2 id="shared-title">Shared accountability</h2>
+                <p>See each other’s study and habit progress (journal stays private).</p>
+            </div>
+            <div class="shared-grid">
+                <div class="grid two">
+                    <div>
+                        <label for="sync-user">Your name</label>
+                        <select id="sync-user">
+                            <option value="Sanjoy">Sanjoy</option>
+                            <option value="Diya">Diya</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="sheets-url">Google Sheets URL</label>
+                        <input id="sheets-url" type="url" placeholder="Paste Apps Script web app URL" />
+                    </div>
+                </div>
+                <div class="buttons">
+                    <button id="save-to-sheets" type="button">💾 Save to Sheets</button>
+                    <button id="sync-with-partner" type="button" class="secondary">🔄 Sync with Partner</button>
+                </div>
+                <ul class="shared-list" id="shared-list"></ul>
+                <p class="helper">📊 All data including journal entries are shared between Sanjoy and Diya</p>
+            </div>
+        </section>
+
+        <section class="card" aria-labelledby="progress-title">
+            <div class="section-title">
+                <h2 id="progress-title">Progress dashboard</h2>
+                <p>See your momentum for the last 7 days.</p>
+            </div>
+            <div class="stats">
+                <div class="stat">
+                    <div>Current streak</div>
+                    <div class="value" id="streak-value">0 days</div>
+                    <div class="helper">Days logged in a row.</div>
+                </div>
+                <div class="stat">
+                    <div>Study hours (last 7 days)</div>
+                    <div class="value" id="week-study">0</div>
+                    <div class="helper">Total hours studied.</div>
+                </div>
+                <div class="stat">
+                    <div>Average phone use</div>
+                    <div class="value" id="week-phone">0 min</div>
+                    <div class="helper">Last 7 days average.</div>
+                </div>
+                <div class="stat">
+                    <div>Days logged</div>
+                    <div class="value" id="week-logged">0</div>
+                    <div class="helper">Last 7 days.</div>
+                </div>
+                <div class="stat">
+                    <div>Habit completion</div>
+                    <div class="value" id="week-habits">0%</div>
+                    <div class="helper">Last 7 days.</div>
+                </div>
+            </div>
+            <div class="status" id="status" role="status" aria-live="polite">
+                Ready when you are.
+            </div>
+        </section>
+
+        <section class="card" aria-labelledby="history-title">
+            <div class="section-title">
+                <h2 id="history-title">Recent entries</h2>
+                <p>A simple view of the last week.</p>
+            </div>
+            <ul class="history" id="history-list"></ul>
+        </section>
+
+        <section class="card" aria-labelledby="actions-title">
+            <div class="section-title">
+                <h2 id="actions-title">Actions</h2>
+                <p>Save daily, export for backup anytime.</p>
+            </div>
+            <div class="buttons">
+                <button id="save-entry">Save entry</button>
+                <button id="load-today" class="secondary">Load today</button>
+                <button id="export-data" class="secondary">Export data</button>
+                <button id="clear-data" class="danger">Clear all data</button>
+            </div>
+            <p class="helper warning">Clearing data removes everything stored in this browser.</p>
+        </section>
+    </main>
+
+    <footer>
+        This is a local, offline tracker. Your entries are stored in your browser only.
+    </footer>
+
+    <script>
+        const STORAGE_KEY = "accountabilityJournal.v1";
+
+        const elements = {
+            date: document.getElementById("entry-date"),
+            mood: document.getElementById("mood"),
+            sleep: document.getElementById("sleep-hours"),
+            studyGoal: document.getElementById("study-goal-hours"),
+            studyActual: document.getElementById("study-hours"),
+            phoneMinutes: document.getElementById("phone-minutes"),
+            task1: document.getElementById("task-1"),
+            task2: document.getElementById("task-2"),
+            task3: document.getElementById("task-3"),
+            reward: document.getElementById("reward"),
+            ifThen: document.getElementById("if-then"),
+            obstacles: document.getElementById("obstacles"),
+            phonePledge: document.getElementById("phone-pledge"),
+            habitName: document.getElementById("habit-name"),
+            habitList: document.getElementById("habit-list"),
+            addHabitButton: document.getElementById("add-habit"),
+            journal: document.getElementById("journal-entry"),
+            wins: document.getElementById("wins"),
+            gratitude: document.getElementById("gratitude"),
+            tomorrow: document.getElementById("tomorrow-focus"),
+            streakValue: document.getElementById("streak-value"),
+            weekStudy: document.getElementById("week-study"),
+            weekPhone: document.getElementById("week-phone"),
+            weekLogged: document.getElementById("week-logged"),
+            weekHabits: document.getElementById("week-habits"),
+            historyList: document.getElementById("history-list"),
+            status: document.getElementById("status"),
+            saveButton: document.getElementById("save-entry"),
+            loadTodayButton: document.getElementById("load-today"),
+            exportButton: document.getElementById("export-data"),
+            clearButton: document.getElementById("clear-data")
+        };
+
+        const sharedElements = {
+            user: document.getElementById("sync-user"),
+            sheetsUrl: document.getElementById("sheets-url"),
+            saveButton: document.getElementById("save-to-sheets"),
+            syncButton: document.getElementById("sync-with-partner"),
+            list: document.getElementById("shared-list")
+        };
+
+        // Load saved sheets URL
+        const savedUrl = localStorage.getItem("sheetsUrl");
+        if (savedUrl) sharedElements.sheetsUrl.value = savedUrl;
+        
+        // Save sheets URL when it changes
+        sharedElements.sheetsUrl.addEventListener("change", () => {
+            localStorage.setItem("sheetsUrl", sharedElements.sheetsUrl.value);
+        });
+
+        const todayString = () => new Date().toISOString().slice(0, 10);
+
+        const defaultEntry = () => ({
+            mood: "",
+            sleep: "",
+            studyGoal: "",
+            studyActual: "",
+            phoneMinutes: "",
+            tasks: ["", "", ""],
+            reward: "",
+            ifThen: "",
+            obstacles: "",
+            phonePledge: false,
+            habitChecks: {},
+            journal: "",
+            wins: "",
+            gratitude: "",
+            tomorrow: "",
+            savedAt: ""
+        });
+
+        const loadState = () => {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (!raw) return { entries: {} };
+                const parsed = JSON.parse(raw);
+                return { entries: parsed.entries || {}, habits: parsed.habits || [] };
+            } catch {
+                return { entries: {}, habits: [] };
+            }
+        };
+
+        const saveState = (state) => {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        };
+
+        const readHabitChecks = () => {
+            const checks = {};
+            const checkboxes = elements.habitList.querySelectorAll('input[type="checkbox"][data-habit-id]');
+            checkboxes.forEach((checkbox) => {
+                checks[checkbox.dataset.habitId] = checkbox.checked;
+            });
+            return checks;
+        };
+
+        const readForm = () => ({
+            mood: elements.mood.value.trim(),
+            sleep: elements.sleep.value,
+            studyGoal: elements.studyGoal.value,
+            studyActual: elements.studyActual.value,
+            phoneMinutes: elements.phoneMinutes.value,
+            tasks: [elements.task1.value, elements.task2.value, elements.task3.value],
+            reward: elements.reward.value.trim(),
+            ifThen: elements.ifThen.value.trim(),
+            obstacles: elements.obstacles.value.trim(),
+            phonePledge: elements.phonePledge.checked,
+            habitChecks: readHabitChecks(),
+            journal: elements.journal.value.trim(),
+            wins: elements.wins.value.trim(),
+            gratitude: elements.gratitude.value.trim(),
+            tomorrow: elements.tomorrow.value.trim(),
+            savedAt: new Date().toISOString()
+        });
+
+        const readSharedPayload = () => {
+            const entry = readForm();
+            const habitSummary = getHabitSummary({ habitChecks: entry.habitChecks });
+            return {
+                mood: entry.mood,
+                sleep: entry.sleep,
+                studyGoal: entry.studyGoal,
+                studyActual: entry.studyActual,
+                phoneMinutes: entry.phoneMinutes,
+                phonePledge: entry.phonePledge,
+                habitDone: habitSummary.done,
+                habitTotal: habitSummary.total,
+                tasks: entry.tasks.filter((task) => task.trim() !== ""),
+                savedAt: entry.savedAt
+            };
+        };
+
+        const writeForm = (entry) => {
+            const data = entry || defaultEntry();
+            elements.mood.value = data.mood || "";
+            elements.sleep.value = data.sleep || "";
+            elements.studyGoal.value = data.studyGoal || "";
+            elements.studyActual.value = data.studyActual || "";
+            elements.phoneMinutes.value = data.phoneMinutes || "";
+            elements.task1.value = data.tasks?.[0] || "";
+            elements.task2.value = data.tasks?.[1] || "";
+            elements.task3.value = data.tasks?.[2] || "";
+            elements.reward.value = data.reward || "";
+            elements.ifThen.value = data.ifThen || "";
+            elements.obstacles.value = data.obstacles || "";
+            elements.phonePledge.checked = Boolean(data.phonePledge);
+            elements.journal.value = data.journal || "";
+            elements.wins.value = data.wins || "";
+            elements.gratitude.value = data.gratitude || "";
+            elements.tomorrow.value = data.tomorrow || "";
+        };
+
+        const defaultHabits = () => ([
+            { id: "deep-work", name: "Deep work block completed" },
+            { id: "no-phone", name: "No phone during study time" },
+            { id: "water", name: "Hydration goal met" },
+            { id: "move", name: "Move your body (walk/stretch)" },
+            { id: "sleep", name: "On time sleep commitment" }
+        ]);
+
+        const ensureHabits = () => {
+            const state = loadState();
+            if (!state.habits || state.habits.length === 0) {
+                state.habits = defaultHabits();
+                saveState(state);
+            }
+            return state.habits;
+        };
+
+        const renderHabits = (entry) => {
+            const habits = ensureHabits();
+            const habitChecks = entry?.habitChecks || {};
+            elements.habitList.innerHTML = "";
+
+            habits.forEach((habit) => {
+                const wrapper = document.createElement("div");
+                wrapper.className = "habit-item";
+
+                const checkbox = document.createElement("input");
+                checkbox.type = "checkbox";
+                checkbox.dataset.habitId = habit.id;
+                checkbox.checked = Boolean(habitChecks[habit.id]);
+
+                const label = document.createElement("label");
+                label.textContent = habit.name;
+                label.setAttribute("for", `${habit.id}-check`);
+
+                checkbox.id = `${habit.id}-check`;
+
+                const actions = document.createElement("div");
+                actions.className = "habit-actions";
+
+                const habitTag = document.createElement("span");
+                habitTag.className = "habit-pill";
+                habitTag.textContent = "daily";
+
+                const deleteButton = document.createElement("button");
+                deleteButton.type = "button";
+                deleteButton.className = "secondary";
+                deleteButton.textContent = "Remove";
+                deleteButton.addEventListener("click", () => removeHabit(habit.id));
+
+                actions.appendChild(habitTag);
+                actions.appendChild(deleteButton);
+
+                wrapper.appendChild(checkbox);
+                wrapper.appendChild(label);
+                wrapper.appendChild(actions);
+                elements.habitList.appendChild(wrapper);
+            });
+        };
+
+        const addHabit = () => {
+            const name = elements.habitName.value.trim();
+            if (!name) {
+                setStatus("Please add a habit name first.");
+                return;
+            }
+            const state = loadState();
+            const newHabit = {
+                id: `habit-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+                name
+            };
+            state.habits = [...(state.habits || []), newHabit];
+            saveState(state);
+            elements.habitName.value = "";
+            renderHabits(state.entries[getSelectedDate()]);
+            setStatus("Habit added. Check it when done.");
+        };
+
+        const removeHabit = (habitId) => {
+            const state = loadState();
+            state.habits = (state.habits || []).filter((habit) => habit.id !== habitId);
+            saveState(state);
+            renderHabits(state.entries[getSelectedDate()]);
+            setStatus("Habit removed.");
+        };
+
+        const setStatus = (message) => {
+            elements.status.textContent = message;
+        };
+
+        const setSharedStatus = (message) => {
+            sharedElements.list.innerHTML = `<li>${message}</li>`;
+        };
+
+        const getSelectedDate = () => elements.date.value || todayString();
+
+        const loadEntry = (date) => {
+            const state = loadState();
+            const entry = state.entries[date];
+            writeForm(entry);
+            renderHabits(entry);
+            setStatus(entry ? `Loaded entry for ${date}.` : `No entry yet for ${date}.`);
+        };
+
+        const saveEntry = () => {
+            const date = getSelectedDate();
+            const state = loadState();
+            state.entries[date] = readForm();
+            saveState(state);
+            setStatus(`Saved entry for ${date}.`);
+            updateStats();
+        };
+
+        const getLastDays = (count) => {
+            const days = [];
+            for (let i = 0; i < count; i++) {
+                const date = new Date();
+                date.setDate(date.getDate() - i);
+                days.push(date.toISOString().slice(0, 10));
+            }
+            return days;
+        };
+
+        const calculateStreak = (entries) => {
+            let streak = 0;
+            const days = getLastDays(365);
+            for (const day of days) {
+                if (entries[day]) {
+                    streak += 1;
+                } else {
+                    break;
+                }
+            }
+            return streak;
+        };
+
+        const getHabitSummary = (entry) => {
+            const checks = entry?.habitChecks || {};
+            const ids = Object.keys(checks);
+            const total = ids.length;
+            let done = 0;
+            ids.forEach((id) => {
+                if (checks[id]) done += 1;
+            });
+            return { done, total };
+        };
+
+        const updateStats = () => {
+            const state = loadState();
+            const entries = state.entries;
+            const streak = calculateStreak(entries);
+            elements.streakValue.textContent = `${streak} day${streak === 1 ? "" : "s"}`;
+
+            const lastSeven = getLastDays(7);
+            let studyTotal = 0;
+            let phoneTotal = 0;
+            let loggedDays = 0;
+            let habitDoneTotal = 0;
+            let habitTotal = 0;
+
+            lastSeven.forEach((date) => {
+                const entry = entries[date];
+                if (entry) {
+                    loggedDays += 1;
+                    studyTotal += Number(entry.studyActual || 0);
+                    phoneTotal += Number(entry.phoneMinutes || 0);
+                    const habitSummary = getHabitSummary(entry);
+                    habitDoneTotal += habitSummary.done;
+                    habitTotal += habitSummary.total;
+                }
+            });
+
+            const phoneAverage = loggedDays ? Math.round(phoneTotal / loggedDays) : 0;
+            const habitPercent = habitTotal ? Math.round((habitDoneTotal / habitTotal) * 100) : 0;
+            elements.weekStudy.textContent = studyTotal.toFixed(1);
+            elements.weekPhone.textContent = `${phoneAverage} min`;
+            elements.weekLogged.textContent = loggedDays.toString();
+            elements.weekHabits.textContent = `${habitPercent}%`;
+
+            renderHistory(lastSeven, entries);
+        };
+
+        const renderHistory = (days, entries) => {
+            elements.historyList.innerHTML = "";
+            days.forEach((date) => {
+                const entry = entries[date];
+                const listItem = document.createElement("li");
+                if (!entry) {
+                    listItem.textContent = `${date}: no entry`;
+                    elements.historyList.appendChild(listItem);
+                    return;
+                }
+                const study = entry.studyActual || "0";
+                const phone = entry.phoneMinutes || "0";
+                const mood = entry.mood ? `Mood: ${entry.mood}` : "Mood: not set";
+                const habitSummary = getHabitSummary(entry);
+                listItem.innerHTML = `<strong>${date}</strong> · Study ${study}h · Phone ${phone}m · Habits ${habitSummary.done}/${habitSummary.total} · ${mood}`;
+                elements.historyList.appendChild(listItem);
+            });
+        };
+
+        const renderSharedUpdates = (rows) => {
+            sharedElements.list.innerHTML = "";
+            if (!rows.length) {
+                sharedElements.list.innerHTML = "<li>Click 'Sync with Partner' to load shared data</li>";
+                return;
+            }
+            rows.forEach((row) => {
+                const listItem = document.createElement("li");
+                const currentUser = sharedElements.user.value;
+                const isMe = row.user === currentUser || row.name === currentUser;
+                
+                listItem.style.borderLeft = isMe ? "4px solid #6ee7b7" : "4px solid #00A2BB";
+                listItem.style.paddingLeft = "12px";
+                
+                const taskText = row.tasks ? `<br>📝 Tasks: ${row.tasks}` : "";
+                const journalText = row.journal ? `<br>📖 Journal: ${row.journal.substring(0, 100)}${row.journal.length > 100 ? "..." : ""}` : "";
+                const winsText = row.wins ? `<br>🎉 Wins: ${row.wins}` : "";
+                
+                listItem.innerHTML = `<strong>${row.date}</strong> · <strong>${row.user || row.name}</strong> ${isMe ? "(You)" : ""}<br>` +
+                    `Study: ${row.studyactual || row.studyActual || 0}h (goal: ${row.studygoal || row.studyGoal || 0}h) · ` +
+                    `Phone: ${row.phoneminutes || row.phoneMinutes || 0}m · ` +
+                    `Habits: ${row.habitdone || row.habitDone || 0}/${row.habittotal || row.habitTotal || 0} · ` +
+                    `Mood: ${row.mood || "not set"} · ` +
+                    `Sleep: ${row.sleep || 0}h` +
+                    taskText + journalText + winsText;
+                sharedElements.list.appendChild(listItem);
+            });
+        };
+
+        const saveToSheets = async () => {
+            const url = sharedElements.sheetsUrl.value.trim();
+            const user = sharedElements.user.value.trim();
+            
+            if (!url) {
+                setSharedStatus("❌ Please paste Google Sheets URL first");
+                return;
+            }
+            if (!user) {
+                setSharedStatus("❌ Please select your name");
+                return;
+            }
+            
+            const date = getSelectedDate();
+            const entry = readForm();
+            
+            const data = {
+                date: date,
+                user: user,
+                mood: entry.mood,
+                sleep: entry.sleep,
+                studyGoal: entry.studyGoal,
+                studyActual: entry.studyActual,
+                phoneMinutes: entry.phoneMinutes,
+                phonePledge: entry.phonePledge ? "Yes" : "No",
+                habitDone: getHabitSummary(entry).done,
+                habitTotal: getHabitSummary(entry).total,
+                tasks: entry.tasks.join(", "),
+                journal: entry.journal,
+                wins: entry.wins,
+                gratitude: entry.gratitude,
+                tomorrow: entry.tomorrow,
+                savedAt: entry.savedAt
+            };
+            
+            setSharedStatus("⏳ Saving to Google Sheets...");
+            
+            try {
+                // Use GET with query params - simplest, no CORS issues
+                const params = new URLSearchParams({
+                    action: 'save',
+                    data: JSON.stringify(data)
+                });
+                
+                const response = await fetch(`${url}?${params.toString()}`);
+                
+                if (!response.ok) throw new Error("Failed to save");
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    setSharedStatus(`✅ Saved ${user}'s data for ${date} to Google Sheets! (Rows: ${result.savedData?.rowsInSheet || 'N/A'})`);
+                } else {
+                    throw new Error(result.error || "Unknown error");
+                }
+                
+                // Auto-sync after save
+                setTimeout(() => syncWithPartner(), 1000);
+            } catch (error) {
+                setSharedStatus(`❌ Error saving: ${error.message}`);
+            }
+        };
+
+        const syncWithPartner = async () => {
+            const url = sharedElements.sheetsUrl.value.trim();
+            
+            if (!url) {
+                setSharedStatus("❌ Please paste Google Sheets URL first");
+                return;
+            }
+            
+            setSharedStatus("⏳ Syncing with partner...");
+            
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error("Failed to load");
+                
+                const data = await response.json();
+                
+                // Sort by date descending
+                data.sort((a, b) => new Date(b.date) - new Date(a.date));
+                
+                renderSharedUpdates(data);
+                setSharedStatus(`✅ Synced! Showing ${data.length} entries`);
+            } catch (error) {
+                setSharedStatus(`❌ Error syncing: ${error.message}`);
+            }
+        };
+
+        const exportData = () => {
+            const state = loadState();
+            const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = `accountability-journal-${todayString()}.json`;
+            link.click();
+            URL.revokeObjectURL(url);
+        };
+
+        const clearData = () => {
+            const confirmed = window.confirm("This will delete all saved entries. Continue?");
+            if (!confirmed) return;
+            localStorage.removeItem(STORAGE_KEY);
+            writeForm(defaultEntry());
+            updateStats();
+            setStatus("All data cleared.");
+        };
+
+        const jumpToSection = (id) => {
+            const section = document.getElementById(id);
+            if (!section) return;
+            section.scrollIntoView({ behavior: "smooth", block: "start" });
+        };
+
+        elements.date.addEventListener("change", (event) => loadEntry(event.target.value));
+        elements.saveButton.addEventListener("click", saveEntry);
+        elements.loadTodayButton.addEventListener("click", () => {
+            elements.date.value = todayString();
+            loadEntry(elements.date.value);
+        });
+        elements.exportButton.addEventListener("click", exportData);
+        elements.clearButton.addEventListener("click", clearData);
+        elements.addHabitButton.addEventListener("click", addHabit);
+        document.getElementById("jump-today").addEventListener("click", () => jumpToSection("today-title"));
+        const syncNowBtn = document.getElementById("sync-now");
+        if (syncNowBtn) syncNowBtn.addEventListener("click", syncWithPartner);
+        sharedElements.saveButton.addEventListener("click", saveToSheets);
+        sharedElements.syncButton.addEventListener("click", syncWithPartner);
+
+        elements.date.value = todayString();
+        loadEntry(elements.date.value);
+        updateStats();
+    </script>
+</body>
+</html>
