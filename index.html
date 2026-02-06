@@ -7,7 +7,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap" rel="stylesheet" />
-    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
     <style>
         :root {
             --bg: #f6f4ff;
@@ -398,15 +397,27 @@
 <body>
     <a class="skip-link" href="#main-content">Skip to main content</a>
     <header class="hero">
-        <div class="soft-badge">Daily check in • No login required</div>
+        <div class="soft-badge">Daily check in • Shared with your partner</div>
         <h1>Daily Study Accountability Journal</h1>
+        <div class="grid two" style="max-width: 600px; margin-bottom: 20px;">
+            <div>
+                <label for="header-user">Current User</label>
+                <select id="header-user" style="font-size: 1.1rem; padding: 12px;">
+                    <option value="Sanjoy">Sanjoy</option>
+                    <option value="Diya">Diya</option>
+                </select>
+            </div>
+            <div>
+                <label for="sheet-url">Shared Google Sheets URL</label>
+                <input id="sheet-url" type="url" placeholder="Paste your Apps Script web app URL" style="padding: 12px;" />
+            </div>
+        </div>
         <p class="intro">
-            A calm, friendly space to track study, habits, and phone use. Start small and build
-            steady progress. Your data stays in your browser.
+            A calm, friendly space to track study, habits, and phone use. All data is shared between Sanjoy and Diya.
         </p>
         <div class="hero-actions">
             <button id="jump-today" type="button">Start today</button>
-            <button id="jump-habits" type="button" class="secondary">Set habits</button>
+            <button id="sync-now" type="button" class="secondary">Sync with partner</button>
         </div>
     </header>
 
@@ -546,16 +557,17 @@
                             <option value="Diya">Diya</option>
                         </select>
                     </div>
+                    <div>
+                        <label for="sheets-url">Google Sheets URL</label>
+                        <input id="sheets-url" type="url" placeholder="Paste Apps Script web app URL" />
+                    </div>
                 </div>
                 <div class="buttons">
-                    <button id="save-to-excel" type="button">Save my data to shared Excel</button>
-                    <button id="load-from-excel" type="button" class="secondary">Load shared Excel file</button>
-                    <button id="download-excel" type="button" class="secondary">Download current Excel</button>
+                    <button id="save-to-sheets" type="button">💾 Save to Sheets</button>
+                    <button id="sync-with-partner" type="button" class="secondary">🔄 Sync with Partner</button>
                 </div>
-                <input type="file" id="excel-upload" accept=".xlsx,.xls" style="display: none;" />
                 <ul class="shared-list" id="shared-list"></ul>
-                <p class="helper">✅ Shared: Study hours, habits, tasks, mood, sleep, phone use<br>
-                🔒 Private (stays on your device): Journal entries, wins, gratitude, tomorrow focus</p>
+                <p class="helper">📊 All data including journal entries are shared between Sanjoy and Diya</p>
             </div>
         </section>
 
@@ -662,14 +674,20 @@
 
         const sharedElements = {
             user: document.getElementById("sync-user"),
-            saveButton: document.getElementById("save-to-excel"),
-            loadButton: document.getElementById("load-from-excel"),
-            downloadButton: document.getElementById("download-excel"),
-            uploadInput: document.getElementById("excel-upload"),
+            sheetsUrl: document.getElementById("sheets-url"),
+            saveButton: document.getElementById("save-to-sheets"),
+            syncButton: document.getElementById("sync-with-partner"),
             list: document.getElementById("shared-list")
         };
 
-        let sharedData = [];
+        // Load saved sheets URL
+        const savedUrl = localStorage.getItem("sheetsUrl");
+        if (savedUrl) sharedElements.sheetsUrl.value = savedUrl;
+        
+        // Save sheets URL when it changes
+        sharedElements.sheetsUrl.addEventListener("change", () => {
+            localStorage.setItem("sheetsUrl", sharedElements.sheetsUrl.value);
+        });
 
         const todayString = () => new Date().toISOString().slice(0, 10);
 
@@ -976,104 +994,111 @@
         const renderSharedUpdates = (rows) => {
             sharedElements.list.innerHTML = "";
             if (!rows.length) {
-                sharedElements.list.innerHTML = "<li>No shared updates yet. Add your data and download the Excel file to share.</li>";
+                sharedElements.list.innerHTML = "<li>Click 'Sync with Partner' to load shared data</li>";
                 return;
             }
             rows.forEach((row) => {
                 const listItem = document.createElement("li");
-                const taskText = row.tasks ? `<br>Tasks: ${row.tasks}` : "";
-                listItem.innerHTML = `<strong>${row.date}</strong> · <strong>${row.name}</strong><br>` +
-                    `Study: ${row.studyActual || 0}h (goal: ${row.studyGoal || 0}h) · ` +
-                    `Phone: ${row.phoneMinutes || 0}m · ` +
-                    `Habits: ${row.habitDone || 0}/${row.habitTotal || 0} · ` +
+                const currentUser = sharedElements.user.value;
+                const isMe = row.user === currentUser || row.name === currentUser;
+                
+                listItem.style.borderLeft = isMe ? "4px solid #6ee7b7" : "4px solid #00A2BB";
+                listItem.style.paddingLeft = "12px";
+                
+                const taskText = row.tasks ? `<br>📝 Tasks: ${row.tasks}` : "";
+                const journalText = row.journal ? `<br>📖 Journal: ${row.journal.substring(0, 100)}${row.journal.length > 100 ? "..." : ""}` : "";
+                const winsText = row.wins ? `<br>🎉 Wins: ${row.wins}` : "";
+                
+                listItem.innerHTML = `<strong>${row.date}</strong> · <strong>${row.user || row.name}</strong> ${isMe ? "(You)" : ""}<br>` +
+                    `Study: ${row.studyactual || row.studyActual || 0}h (goal: ${row.studygoal || row.studyGoal || 0}h) · ` +
+                    `Phone: ${row.phoneminutes || row.phoneMinutes || 0}m · ` +
+                    `Habits: ${row.habitdone || row.habitDone || 0}/${row.habittotal || row.habitTotal || 0} · ` +
                     `Mood: ${row.mood || "not set"} · ` +
-                    `Sleep: ${row.sleep || 0}h${taskText}`;
+                    `Sleep: ${row.sleep || 0}h` +
+                    taskText + journalText + winsText;
                 sharedElements.list.appendChild(listItem);
             });
         };
 
-        const saveToExcel = () => {
+        const saveToSheets = async () => {
+            const url = sharedElements.sheetsUrl.value.trim();
             const user = sharedElements.user.value.trim();
+            
+            if (!url) {
+                setSharedStatus("❌ Please paste Google Sheets URL first");
+                return;
+            }
             if (!user) {
-                setSharedStatus("Please select your name.");
+                setSharedStatus("❌ Please select your name");
                 return;
             }
             
             const date = getSelectedDate();
-            const payload = readSharedPayload();
+            const entry = readForm();
             
-            const newEntry = {
+            const data = {
                 date: date,
-                name: user,
-                mood: payload.mood,
-                sleep: payload.sleep,
-                studyGoal: payload.studyGoal,
-                studyActual: payload.studyActual,
-                phoneMinutes: payload.phoneMinutes,
-                phonePledge: payload.phonePledge ? "Yes" : "No",
-                habitDone: payload.habitDone,
-                habitTotal: payload.habitTotal,
-                tasks: payload.tasks.join(", "),
-                savedAt: payload.savedAt
+                user: user,
+                mood: entry.mood,
+                sleep: entry.sleep,
+                studyGoal: entry.studyGoal,
+                studyActual: entry.studyActual,
+                phoneMinutes: entry.phoneMinutes,
+                phonePledge: entry.phonePledge ? "Yes" : "No",
+                habitDone: getHabitSummary(entry).done,
+                habitTotal: getHabitSummary(entry).total,
+                tasks: entry.tasks.join(", "),
+                journal: entry.journal,
+                wins: entry.wins,
+                gratitude: entry.gratitude,
+                tomorrow: entry.tomorrow,
+                savedAt: entry.savedAt
             };
             
-            const existingIndex = sharedData.findIndex(
-                entry => entry.date === date && entry.name === user
-            );
+            setSharedStatus("⏳ Saving to Google Sheets...");
             
-            if (existingIndex >= 0) {
-                sharedData[existingIndex] = newEntry;
-            } else {
-                sharedData.push(newEntry);
+            try {
+                const response = await fetch(url, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(data)
+                });
+                
+                if (!response.ok) throw new Error("Failed to save");
+                
+                setSharedStatus(`✅ Saved ${user}'s data for ${date} to Google Sheets!`);
+                
+                // Auto-sync after save
+                setTimeout(() => syncWithPartner(), 1000);
+            } catch (error) {
+                setSharedStatus(`❌ Error saving: ${error.message}`);
             }
-            
-            sharedData.sort((a, b) => new Date(b.date) - new Date(a.date));
-            
-            renderSharedUpdates(sharedData);
-            setSharedStatus(`✅ Your data for ${date} added to shared list. Click "Download current Excel" to save the file.`);
         };
 
-        const downloadExcel = () => {
-            if (sharedData.length === 0) {
-                setSharedStatus("No data to download. Add your data first.");
+        const syncWithPartner = async () => {
+            const url = sharedElements.sheetsUrl.value.trim();
+            
+            if (!url) {
+                setSharedStatus("❌ Please paste Google Sheets URL first");
                 return;
             }
             
-            const worksheet = XLSX.utils.json_to_sheet(sharedData);
-            const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "Shared Accountability");
+            setSharedStatus("⏳ Syncing with partner...");
             
-            const filename = `accountability-shared-${todayString()}.xlsx`;
-            XLSX.writeFile(workbook, filename);
-            
-            setSharedStatus(`✅ Excel file downloaded: ${filename}`);
-        };
-
-        const loadFromExcel = () => {
-            sharedElements.uploadInput.click();
-        };
-
-        const handleExcelUpload = (event) => {
-            const file = event.target.files[0];
-            if (!file) return;
-            
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                try {
-                    const data = new Uint8Array(e.target.result);
-                    const workbook = XLSX.read(data, { type: 'array' });
-                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                    const jsonData = XLSX.utils.sheet_to_json(firstSheet);
-                    
-                    sharedData = jsonData;
-                    renderSharedUpdates(sharedData);
-                    setSharedStatus(`✅ Loaded ${jsonData.length} entries from Excel file.`);
-                } catch (error) {
-                    setSharedStatus("❌ Failed to read Excel file. Please check the file format.");
-                }
-            };
-            reader.readAsArrayBuffer(file);
-            event.target.value = '';
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error("Failed to load");
+                
+                const data = await response.json();
+                
+                // Sort by date descending
+                data.sort((a, b) => new Date(b.date) - new Date(a.date));
+                
+                renderSharedUpdates(data);
+                setSharedStatus(`✅ Synced! Showing ${data.length} entries`);
+            } catch (error) {
+                setSharedStatus(`❌ Error syncing: ${error.message}`);
+            }
         };
 
         const exportData = () => {
@@ -1112,11 +1137,10 @@
         elements.clearButton.addEventListener("click", clearData);
         elements.addHabitButton.addEventListener("click", addHabit);
         document.getElementById("jump-today").addEventListener("click", () => jumpToSection("today-title"));
-        document.getElementById("jump-habits").addEventListener("click", () => jumpToSection("habits-title"));
-        sharedElements.saveButton.addEventListener("click", saveToExcel);
-        sharedElements.loadButton.addEventListener("click", loadFromExcel);
-        sharedElements.downloadButton.addEventListener("click", downloadExcel);
-        sharedElements.uploadInput.addEventListener("change", handleExcelUpload);
+        const syncNowBtn = document.getElementById("sync-now");
+        if (syncNowBtn) syncNowBtn.addEventListener("click", syncWithPartner);
+        sharedElements.saveButton.addEventListener("click", saveToSheets);
+        sharedElements.syncButton.addEventListener("click", syncWithPartner);
 
         elements.date.value = todayString();
         loadEntry(elements.date.value);
