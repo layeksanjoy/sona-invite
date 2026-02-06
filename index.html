@@ -6,7 +6,7 @@
     <title>Daily Study Accountability Journal</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet" />
     <style>
         :root {
             --bg: #f6f4ff;
@@ -27,10 +27,14 @@
 
         body {
             margin: 0;
-            font-family: "Pixelify Sans", system-ui, -apple-system, Arial, sans-serif;
+            font-family: "Roboto", system-ui, -apple-system, Arial, sans-serif;
             background: radial-gradient(circle at top, #ffffff, var(--bg));
             color: var(--text);
-            line-height: 1.5;
+            line-height: 1.6;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: "Pixelify Sans", system-ui, sans-serif;
         }
 
         .skip-link {
@@ -680,13 +684,52 @@
             list: document.getElementById("shared-list")
         };
 
-        // Load saved sheets URL
-        const savedUrl = localStorage.getItem("sheetsUrl");
-        if (savedUrl) sharedElements.sheetsUrl.value = savedUrl;
+        // Header user dropdown
+        const headerUser = document.getElementById("header-user");
+        const headerSheetUrl = document.getElementById("sheet-url");
+
+        // Default Google Sheets URL (embedded)
+        const DEFAULT_SHEETS_URL = "https://script.google.com/macros/s/AKfycbykVTtoUT5F8o1qLBuuzMqGyPhyO4cCsKzwLpK_sWfpxTFGr3Hhco-xzVixkcbvuYyB/exec";
+
+        // Load saved sheets URL and user
+        const savedUrl = localStorage.getItem("sheetsUrl") || DEFAULT_SHEETS_URL;
+        const savedUser = localStorage.getItem("currentUser") || "Sanjoy";
         
-        // Save sheets URL when it changes
+        // Set URL (use saved or default)
+        sharedElements.sheetsUrl.value = savedUrl;
+        headerSheetUrl.value = savedUrl;
+        if (!localStorage.getItem("sheetsUrl")) {
+            localStorage.setItem("sheetsUrl", DEFAULT_SHEETS_URL);
+        }
+        
+        // Set user
+        sharedElements.user.value = savedUser;
+        headerUser.value = savedUser;
+        
+        // Save sheets URL when it changes (sync both fields)
         sharedElements.sheetsUrl.addEventListener("change", () => {
             localStorage.setItem("sheetsUrl", sharedElements.sheetsUrl.value);
+            headerSheetUrl.value = sharedElements.sheetsUrl.value;
+        });
+        
+        headerSheetUrl.addEventListener("change", () => {
+            localStorage.setItem("sheetsUrl", headerSheetUrl.value);
+            sharedElements.sheetsUrl.value = headerSheetUrl.value;
+        });
+        
+        // Sync user selection between both dropdowns
+        sharedElements.user.addEventListener("change", () => {
+            localStorage.setItem("currentUser", sharedElements.user.value);
+            headerUser.value = sharedElements.user.value;
+            // Refresh stats for the new user
+            if (savedUrl) syncWithPartner();
+        });
+        
+        headerUser.addEventListener("change", () => {
+            localStorage.setItem("currentUser", headerUser.value);
+            sharedElements.user.value = headerUser.value;
+            // Refresh stats for the new user
+            if (savedUrl) syncWithPartner();
         });
 
         const todayString = () => new Date().toISOString().slice(0, 10);
@@ -916,13 +959,30 @@
         const calculateStreak = (entries) => {
             let streak = 0;
             const days = getLastDays(365);
-            for (const day of days) {
-                if (entries[day]) {
+            
+            // Find the first day with an entry (could be today or a past day)
+            let startIndex = -1;
+            for (let i = 0; i < days.length; i++) {
+                if (entries[days[i]]) {
+                    startIndex = i;
+                    break;
+                }
+            }
+            
+            // If no entries found, streak is 0
+            if (startIndex === -1) {
+                return 0;
+            }
+            
+            // Count consecutive days from the most recent entry backwards
+            for (let i = startIndex; i < days.length; i++) {
+                if (entries[days[i]]) {
                     streak += 1;
                 } else {
                     break;
                 }
             }
+            
             return streak;
         };
 
@@ -1102,8 +1162,59 @@
                 // Sort by date descending
                 data.sort((a, b) => new Date(b.date) - new Date(a.date));
                 
+                // Merge synced data into localStorage for current user
+                const state = loadState();
+                const currentUser = sharedElements.user.value;
+                
+                data.forEach((row) => {
+                    // Only merge entries for the current user
+                    if (row.user === currentUser || row.name === currentUser) {
+                        // Convert ISO timestamp to YYYY-MM-DD format
+                        const date = new Date(row.date).toISOString().slice(0, 10);
+                        
+                        // Convert Google Sheets data back to entry format
+                        const entry = {
+                            mood: row.mood || "",
+                            sleep: row.sleep || "",
+                            studyGoal: row.studygoal || row.studyGoal || "",
+                            studyActual: row.studyactual || row.studyActual || "",
+                            phoneMinutes: row.phoneminutes || row.phoneMinutes || "",
+                            tasks: row.tasks ? row.tasks.split(", ").filter(t => t.trim()) : ["", "", ""],
+                            reward: "",
+                            ifThen: "",
+                            obstacles: "",
+                            phonePledge: row.phonepledge === "Yes" || row.phonePledge === "Yes",
+                            habitChecks: {},
+                            journal: row.journal || "",
+                            wins: row.wins || "",
+                            gratitude: row.gratitude || "",
+                            tomorrow: row.tomorrow || "",
+                            savedAt: row.savedat || row.savedAt || ""
+                        };
+                        
+                        // Merge with existing entry (keep local data if more complete)
+                        if (state.entries[date]) {
+                            state.entries[date] = { ...state.entries[date], ...entry };
+                        } else {
+                            state.entries[date] = entry;
+                        }
+                    }
+                });
+                
+                saveState(state);
+                
+                // Update the Progress dashboard and Recent entries
+                updateStats();
+                
+                // If we're viewing today's date, reload the form
+                const currentDate = getSelectedDate();
+                if (state.entries[currentDate]) {
+                    writeForm(state.entries[currentDate]);
+                    renderHabits(state.entries[currentDate]);
+                }
+                
                 renderSharedUpdates(data);
-                setSharedStatus(`✅ Synced! Showing ${data.length} entries`);
+                setSharedStatus(`✅ Synced! Showing ${data.length} entries. Progress dashboard updated.`);
             } catch (error) {
                 setSharedStatus(`❌ Error syncing: ${error.message}`);
             }
@@ -1153,6 +1264,11 @@
         elements.date.value = todayString();
         loadEntry(elements.date.value);
         updateStats();
+        
+        // Auto-sync on page load if URL is saved
+        if (savedUrl) {
+            syncWithPartner();
+        }
     </script>
 </body>
 </html>
