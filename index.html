@@ -1058,15 +1058,23 @@
             setSharedStatus("⏳ Saving to Google Sheets...");
             
             try {
-                const response = await fetch(url, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(data)
+                // Use GET with query params - simplest, no CORS issues
+                const params = new URLSearchParams({
+                    action: 'save',
+                    data: JSON.stringify(data)
                 });
+                
+                const response = await fetch(`${url}?${params.toString()}`);
                 
                 if (!response.ok) throw new Error("Failed to save");
                 
-                setSharedStatus(`✅ Saved ${user}'s data for ${date} to Google Sheets!`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    setSharedStatus(`✅ Saved ${user}'s data for ${date} to Google Sheets! (Rows: ${result.savedData?.rowsInSheet || 'N/A'})`);
+                } else {
+                    throw new Error(result.error || "Unknown error");
+                }
                 
                 // Auto-sync after save
                 setTimeout(() => syncWithPartner(), 1000);
